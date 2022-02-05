@@ -7,10 +7,19 @@ var direction
 export var acceleration = 10
 export var deceleration = 15
 export var max_speed = 100
-export (Curve) var acceleration_curve
+
 
 var velocity = Vector2()
+#jumping variables
+export var jump_slowing_down = 3
 
+export var jump_height : float
+export var jump_time_to_peak : float
+export var jump_time_to_descent : float
+
+onready var jump_velocity : float = ((2.0 * jump_height) / jump_time_to_peak) * -1.0
+onready var jump_gravity : float = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
+onready var fall_gravity : float = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 
 
 func _ready():
@@ -23,11 +32,19 @@ func _process(delta):
 
 func _physics_process(delta):
 	movement()
-	#print(velocity.x)
+	print(max_speed)
+	
+	if !is_on_floor():
+		velocity.y += get_gravity() * delta
+		
+	
+	if Input.is_action_just_pressed("ui_jump") and is_on_floor():
+		jump()
+	
 
 
 func movement():
-	#acceleration and deceleration 
+	#acceleration 
 	if is_moving:
 		acceleration()
 	
@@ -35,11 +52,9 @@ func movement():
 	
 	#controls
 	if Input.is_action_pressed("ui_left"):
-		#velocity.x -= current_speed
 		is_moving = true
 		direction = "left"
 	elif Input.is_action_pressed("ui_right"):
-		#velocity.x += current_speed
 		is_moving = true
 		direction = "right"
 	else: 
@@ -52,9 +67,9 @@ func movement():
 
 func acceleration():
 	if velocity.x < max_speed and direction == "right":
-		velocity.x += acceleration
+		velocity.x += acceleration / 2
 	elif velocity.x > -max_speed and direction == "left":
-		velocity.x -= acceleration
+		velocity.x -= acceleration / 2
 	else:
 		#current_speed = max_speed
 		velocity.x = max_speed * sign(velocity.x)
@@ -67,7 +82,12 @@ func deceleration():
 	else: velocity.x = 0
 
 
+func get_gravity() -> float:
+	return jump_gravity if velocity.y < 0.0 else fall_gravity
 
+func jump():
+	velocity.y = jump_velocity
+	max_speed -= jump_slowing_down
 
 
 

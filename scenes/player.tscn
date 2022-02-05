@@ -8,6 +8,10 @@ extents = Vector2( 8, 12 )
 
 [node name="KinematicBody2D" type="KinematicBody2D"]
 script = ExtResource( 2 )
+deceleration = 20
+jump_height = 25.0
+jump_time_to_peak = 0.3
+jump_time_to_descent = 0.2
 
 [node name="Icon" type="Sprite" parent="."]
 position = Vector2( 0, -12 )

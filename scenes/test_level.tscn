@@ -1,13 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
 [ext_resource path="res://scenes/player.tscn" type="PackedScene" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 252.5, 8 )
-
-[sub_resource type="Curve" id=2]
-_data = [ Vector2( 0, 0 ), 0.0, -0.405742, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
 
 [node name="test_level" type="Node2D"]
 
@@ -31,4 +28,3 @@ current = true
 position = Vector2( 0, 40 )
 acceleration = 20
 deceleration = 7
-acceleration_curve = SubResource( 2 )
