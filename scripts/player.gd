@@ -36,7 +36,8 @@ func _process(delta):
 		max_speed += jump_slowing_down
 		has_jumped = false
 		tick = false
-
+	
+	
 func _physics_process(delta):
 	movement()
 	#print(velocity.x)
