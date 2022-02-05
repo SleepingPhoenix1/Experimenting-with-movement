@@ -32,7 +32,7 @@ func _process(delta):
 
 func _physics_process(delta):
 	movement()
-	print(max_speed)
+	#print(max_speed)
 	
 	if !is_on_floor():
 		velocity.y += get_gravity() * delta
@@ -87,7 +87,7 @@ func get_gravity() -> float:
 
 func jump():
 	velocity.y = jump_velocity
-	max_speed -= jump_slowing_down
+	#max_speed -= jump_slowing_down
 
 
 
