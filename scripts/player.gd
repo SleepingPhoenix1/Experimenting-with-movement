@@ -87,7 +87,7 @@ func get_gravity() -> float:
 
 func jump():
 	velocity.y = jump_velocity
-	#max_speed -= jump_slowing_down
+	#/max_speed -= jump_slowing_down
 
 
 
