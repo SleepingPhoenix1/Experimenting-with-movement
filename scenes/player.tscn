@@ -8,11 +8,14 @@ extents = Vector2( 8, 12 )
 
 [node name="KinematicBody2D" type="KinematicBody2D"]
 script = ExtResource( 2 )
-deceleration = 20
-jump_slowing_down = 30
+acceleration = 30
+max_speed = 170
+jump_slowing_down = 40
 jump_height = 25.0
 jump_time_to_peak = 0.3
 jump_time_to_descent = 0.2
+lowfallMultiplier = 30
+Wall_jump_Velocity = Vector2( 230, -210 )
 
 [node name="Icon" type="Sprite" parent="."]
 position = Vector2( 0, -12 )
@@ -22,3 +25,27 @@ texture = ExtResource( 1 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -12 )
 shape = SubResource( 1 )
+
+[node name="WallRaycastsRight" type="Node2D" parent="."]
+
+[node name="RayCast2D" type="RayCast2D" parent="WallRaycastsRight"]
+position = Vector2( 8.07475, -23.9056 )
+enabled = true
+cast_to = Vector2( 1, 0 )
+
+[node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsRight"]
+position = Vector2( 8.14779, -0.0353727 )
+enabled = true
+cast_to = Vector2( 1, 0 )
+
+[node name="WallRaycastsLeft" type="Node2D" parent="."]
+
+[node name="RayCast2D" type="RayCast2D" parent="WallRaycastsLeft"]
+position = Vector2( -8.14526, -23.9477 )
+enabled = true
+cast_to = Vector2( -1, 0 )
+
+[node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsLeft"]
+position = Vector2( -8.07221, -0.0774574 )
+enabled = true
+cast_to = Vector2( -1, 0 )
