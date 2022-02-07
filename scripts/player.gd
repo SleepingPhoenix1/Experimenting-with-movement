@@ -25,10 +25,14 @@ onready var jump_velocity : float = ((2.0 * jump_height) / jump_time_to_peak) * 
 onready var jump_gravity : float = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
 onready var fall_gravity : float = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 
+export var maxfallspeed = 200
+var has_pressed_jump = false
+
 
 func _ready():
 	#for some reason has_jumped fires off without a reason
 	max_speed -= jump_slowing_down
+	
 
 
 func _process(delta):
@@ -36,8 +40,14 @@ func _process(delta):
 		max_speed += jump_slowing_down
 		has_jumped = false
 		tick = false
+		
 	
 	
+	
+	
+
+
+
 func _physics_process(delta):
 	movement()
 	#print(velocity.x)
@@ -49,10 +59,13 @@ func _physics_process(delta):
 		if has_jumped and !tick:
 			max_speed -= jump_slowing_down
 			tick = true
+			has_pressed_jump = false
 		has_jumped = true
 	
-	if Input.is_action_just_pressed("ui_jump") and is_on_floor():
-		jump()
+	if Input.is_action_just_pressed("ui_jump"):
+		has_pressed_jump = true
+		if is_on_floor():
+			jump()
 	
 	#low jumping
 	if has_jumped and Input.is_action_just_released("ui_jump") and velocity.y < 0:
@@ -79,6 +92,18 @@ func movement():
 		deceleration()
 	move_and_slide(velocity, Vector2.UP)
 	
+	#max falling speed
+	if velocity.y > maxfallspeed:
+		velocity.y = maxfallspeed
+	
+	#stops y velocity if you hit ceiling
+	if is_on_ceiling():
+		velocity.y = 0
+	
+	#removes y velocity when on ground
+	if is_on_floor() and !has_pressed_jump:
+		velocity.y = 1
+	
 
 
 func acceleration():
@@ -87,8 +112,14 @@ func acceleration():
 	elif velocity.x > -max_speed and direction == "left":
 		velocity.x -= acceleration / 2
 	else:
-		#current_speed = max_speed
 		velocity.x = max_speed * sign(velocity.x)
+	
+	
+	
+
+
+
+
 
 func deceleration():
 	if velocity.x > 0 and direction == "right":
