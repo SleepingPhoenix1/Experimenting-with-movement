@@ -4,8 +4,9 @@ signal landed
 var tick = false
 var current_speed = 0
 var is_moving = false
-var has_jumped = false
+
 var direction
+var can_move = true
 
 export var acceleration = 10
 export var deceleration = 15
@@ -27,6 +28,7 @@ onready var fall_gravity : float = ((-2.0 * jump_height) / (jump_time_to_descent
 #falling variables
 export var maxfallspeed = 200
 var has_pressed_jump = false
+var has_jumped = false
 
 #wall stuff variables
 onready var left_wall_raycasts = $WallRaycastsLeft
@@ -35,7 +37,9 @@ var wall_direction = 0
 export var max_wall_slide_speed = 20
 export var Wall_jump_Velocity = Vector2(10, 10)
 var has_wall_jumped =false
+export var wall_climb_speed = 50
 
+var can_wall_climb = true
 
 func _ready():
 	pass
@@ -47,7 +51,7 @@ func _process(delta):
 		has_jumped = false
 		has_wall_jumped = false
 		tick = false
-		
+		can_wall_climb = true
 	
 	
 	
@@ -58,11 +62,12 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	#print(velocity.y )
+	print(velocity.y)
 	
 	#lowers max speed if in air
 	if !is_on_floor():
 		#gravity
+		
 		velocity.y += get_gravity() * delta 
 		if has_jumped and !tick:
 			max_speed -= jump_slowing_down
@@ -82,7 +87,7 @@ func _physics_process(delta):
 
 func movement():
 	#acceleration 
-	if is_moving:
+	if is_moving and can_move:
 		acceleration()
 	
 	
@@ -121,7 +126,23 @@ func movement():
 			velocity.y = max_wall_slide_speed
 		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0:
 			velocity.y = max_wall_slide_speed
-
+	
+	#wall climbing
+	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb:
+		can_move = false
+		#velocity.y = -11.111112
+		jump_gravity = 0
+		fall_gravity = 0
+		if Input.is_action_pressed("ui_up"):
+			velocity.y = -wall_climb_speed #- 11.111112
+		elif Input.is_action_pressed("ui_down"):
+			velocity.y = wall_climb_speed#$ - 11.111112
+		else: velocity.y = 0
+		wall_jumping()
+	else:
+		can_move = true
+		jump_gravity = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
+		fall_gravity = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 
 
 
@@ -154,6 +175,7 @@ func jump(): #jumping
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
+		can_wall_climb = false
 		has_wall_jumped = true
 		var wall_jump_velocity = Wall_jump_Velocity
 		wall_jump_velocity.x *= -wall_direction 
