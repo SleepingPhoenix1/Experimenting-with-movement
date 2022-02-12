@@ -4,12 +4,13 @@
 [ext_resource path="res://scripts/player.gd" type="Script" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 8, 12 )
+extents = Vector2( 8, 8 )
 
 [node name="KinematicBody2D" type="KinematicBody2D"]
 script = ExtResource( 2 )
-acceleration = 30
-max_speed = 170
+acceleration = 20
+deceleration = 20
+max_speed = 120
 jump_slowing_down = 20
 jump_height = 30.0
 jump_time_to_peak = 0.3
@@ -17,21 +18,22 @@ jump_time_to_descent = 0.2
 lowfallMultiplier = 40
 maxfallspeed = 500
 Wall_jump_Velocity = Vector2( 230, -210 )
+wall_climb_speed = 75
+stamina_wall_climb_jump = 50
 
 [node name="Icon" type="Sprite" parent="."]
-visible = false
-position = Vector2( 0, -12 )
-scale = Vector2( 0.25, 0.375 )
+position = Vector2( 0, -8 )
+scale = Vector2( 0.25, 0.25 )
 texture = ExtResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 0, -12 )
+position = Vector2( 0, -8 )
 shape = SubResource( 1 )
 
 [node name="WallRaycastsRight" type="Node2D" parent="."]
 
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsRight"]
-position = Vector2( 8.07475, -23.9056 )
+position = Vector2( 8.075, -16 )
 enabled = true
 cast_to = Vector2( 0.1, 0 )
 
@@ -43,7 +45,7 @@ cast_to = Vector2( 0.1, 0 )
 [node name="WallRaycastsLeft" type="Node2D" parent="."]
 
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsLeft"]
-position = Vector2( -8.14526, -23.9477 )
+position = Vector2( -8.145, -16 )
 enabled = true
 cast_to = Vector2( -0.1, 0 )
 
@@ -52,16 +54,6 @@ position = Vector2( -8.07221, -0.0774574 )
 enabled = true
 cast_to = Vector2( -0.1, 0 )
 
-[node name="Polygon2D" type="Polygon2D" parent="."]
-color = Color( 0.886275, 0.737255, 0.223529, 1 )
-polygon = PoolVector2Array( 8.10355, -0.305458, 3.1538, -13.9173, 11.9926, -14.6244, 2.09315, -17.276, 8.11552, -19.2207, 8.1193, -25.1849, -9.39734, -25.4961, -8.69023, -18.1599, -2.59144, -17.718, -11.0767, -15.7734, -3.6521, -14.2708, -9.48573, -0.0402908, -0.293339, -7.73008 )
-
-[node name="Polygon2D" type="Polygon2D" parent="Polygon2D"]
-position = Vector2( 0, -0.530331 )
-color = Color( 0.427451, 0.584314, 0.913725, 1 )
-polygon = PoolVector2Array( -3.91726, -22.2258, -1.79594, -22.3142, -1.61916, -20.458, -3.91726, -20.6348 )
-
-[node name="Polygon2D2" type="Polygon2D" parent="Polygon2D"]
-position = Vector2( 6.0988, -0.618717 )
-color = Color( 0.427451, 0.584314, 0.913725, 1 )
-polygon = PoolVector2Array( -3.91726, -22.2258, -1.79594, -22.3142, -1.61916, -20.458, -3.91726, -20.6348 )
+[node name="Coyote timer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true

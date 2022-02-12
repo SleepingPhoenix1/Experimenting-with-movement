@@ -12,18 +12,16 @@ extents = Vector2( 32.5, 8 )
 [node name="test_level" type="Node2D"]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2( -120, 56 )
+position = Vector2( -64, 216 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Icon" type="Sprite" parent="StaticBody2D"]
-position = Vector2( 100, 144 )
 scale = Vector2( 7.875, 0.25 )
 texture = ExtResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2( 99.5, 144 )
 shape = SubResource( 1 )
 
 [node name="StaticBody2D4" type="StaticBody2D" parent="."]
@@ -55,19 +53,17 @@ texture = ExtResource( 1 )
 shape = SubResource( 2 )
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="."]
-position = Vector2( 240, 112 )
+position = Vector2( 192, 144 )
 rotation = 1.5708
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Icon" type="Sprite" parent="StaticBody2D2"]
-position = Vector2( 100, 144 )
 scale = Vector2( 7.875, 0.25 )
 texture = ExtResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
-position = Vector2( 99.5, 144 )
 shape = SubResource( 1 )
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="."]

@@ -41,28 +41,25 @@ export var wall_climb_speed = 50
 
 var can_wall_climb = true
 
+#stamina
+export var max_stamina = 200
+var stamina 
+export var stamina_on_wall : float = 1
+export var stamina_wall_climb = 2
+export var stamina_wall_climb_jump = 5
+
+
 func _ready():
 	pass
 
 
 func _process(delta):
 	if (has_jumped or has_wall_jumped) and is_on_floor():
-		max_speed = 170
+		max_speed = 120
 		has_jumped = false
 		has_wall_jumped = false
 		tick = false
-		can_wall_climb = true
-	
-	
-	
-	
-
-
-
-func _physics_process(delta):
-	movement()
-	_update_wall_directions()
-	print(velocity.y)
+		
 	
 	#lowers max speed if in air
 	if !is_on_floor():
@@ -75,10 +72,22 @@ func _physics_process(delta):
 			has_pressed_jump = false
 		has_jumped = true
 	
+	
+
+
+
+func _physics_process(delta):
+	movement()
+	_update_wall_directions()
+	print(stamina)
+	
+	
+	
 	if Input.is_action_just_pressed("ui_jump"):
 		has_pressed_jump = true
-		if is_on_floor():
+		if is_on_floor() or !$"Coyote timer".is_stopped():
 			jump()
+			$"Coyote timer".stop()
 	
 	#low jumping
 	if has_jumped and Input.is_action_just_released("ui_jump") and velocity.y < 0:
@@ -96,16 +105,21 @@ func movement():
 	if Input.is_action_pressed("ui_left"):
 		is_moving = true
 		direction = -1
-		$Polygon2D.scale.x = -1
 	elif Input.is_action_pressed("ui_right"):
 		is_moving = true
 		direction = 1
-		$Polygon2D.scale.x = 1
 	else: 
 		
 		is_moving = false
 		deceleration()
+	
+	#coyote timer
+	var was_on_floor = is_on_floor()
+	
 	move_and_slide(velocity, Vector2.UP)
+	
+	if !is_on_floor() and was_on_floor and !has_jumped and velocity.y > 0:
+		$"Coyote timer".start()
 	
 	#max falling speed
 	if velocity.y > maxfallspeed:
@@ -118,6 +132,16 @@ func movement():
 	#removes y velocity when on ground
 	if is_on_floor() and !has_jumped:
 		velocity.y = 1
+		stamina = max_stamina
+	
+	#removes x velocity if colliding with a wall
+	if is_on_wall():
+		velocity.x = 0
+	
+	#fall detector
+	if velocity.y > 0:
+		can_wall_climb = true
+		
 	
 	#wall jumping and sliding
 	if !is_on_floor() and wall_direction != 0:
@@ -128,22 +152,29 @@ func movement():
 			velocity.y = max_wall_slide_speed
 	
 	#wall climbing
-	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb:
+	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb and stamina > 0:
 		can_move = false
-		#velocity.y = -11.111112
 		jump_gravity = 0
 		fall_gravity = 0
 		if Input.is_action_pressed("ui_up"):
-			velocity.y = -wall_climb_speed #- 11.111112
+			velocity.y = -wall_climb_speed 
+			stamina -= stamina_wall_climb
 		elif Input.is_action_pressed("ui_down"):
-			velocity.y = wall_climb_speed#$ - 11.111112
-		else: velocity.y = 0
+			velocity.y = wall_climb_speed
+			stamina -= stamina_wall_climb
+		elif Input.is_action_just_pressed("ui_jump"):
+			pass
+		else: 
+			velocity.y = 0
+			stamina -= stamina_on_wall
 		wall_jumping()
 	else:
 		can_move = true
 		jump_gravity = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
 		fall_gravity = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
-
+	
+	
+	
 
 
 func acceleration():
@@ -175,6 +206,7 @@ func jump(): #jumping
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
+		stamina -= stamina_wall_climb_jump
 		can_wall_climb = false
 		has_wall_jumped = true
 		var wall_jump_velocity = Wall_jump_Velocity
