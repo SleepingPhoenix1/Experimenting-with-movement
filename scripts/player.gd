@@ -38,14 +38,12 @@ var has_wall_jumped =false
 
 
 func _ready():
-	#for some reason has_jumped fires off without a reason
-	max_speed -= jump_slowing_down
-	
+	pass
 
 
 func _process(delta):
 	if (has_jumped or has_wall_jumped) and is_on_floor():
-		max_speed += jump_slowing_down
+		max_speed = 170
 		has_jumped = false
 		has_wall_jumped = false
 		tick = false
@@ -60,7 +58,7 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	#print(wall_direction)
+	#print(velocity.y )
 	
 	#lowers max speed if in air
 	if !is_on_floor():
@@ -93,9 +91,11 @@ func movement():
 	if Input.is_action_pressed("ui_left"):
 		is_moving = true
 		direction = -1
+		$Polygon2D.scale.x = -1
 	elif Input.is_action_pressed("ui_right"):
 		is_moving = true
 		direction = 1
+		$Polygon2D.scale.x = 1
 	else: 
 		
 		is_moving = false
@@ -111,7 +111,7 @@ func movement():
 		velocity.y = 0
 	
 	#removes y velocity when on ground
-	if is_on_floor() and !has_pressed_jump:
+	if is_on_floor() and !has_jumped:
 		velocity.y = 1
 	
 	#wall jumping and sliding

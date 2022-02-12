@@ -10,14 +10,16 @@ extents = Vector2( 8, 12 )
 script = ExtResource( 2 )
 acceleration = 30
 max_speed = 170
-jump_slowing_down = 40
-jump_height = 25.0
+jump_slowing_down = 20
+jump_height = 30.0
 jump_time_to_peak = 0.3
 jump_time_to_descent = 0.2
-lowfallMultiplier = 30
+lowfallMultiplier = 40
+maxfallspeed = 300
 Wall_jump_Velocity = Vector2( 230, -210 )
 
 [node name="Icon" type="Sprite" parent="."]
+visible = false
 position = Vector2( 0, -12 )
 scale = Vector2( 0.25, 0.375 )
 texture = ExtResource( 1 )
@@ -49,3 +51,17 @@ cast_to = Vector2( -1, 0 )
 position = Vector2( -8.07221, -0.0774574 )
 enabled = true
 cast_to = Vector2( -1, 0 )
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color( 0.886275, 0.737255, 0.223529, 1 )
+polygon = PoolVector2Array( 8.10355, -0.305458, 3.1538, -13.9173, 11.9926, -14.6244, 2.09315, -17.276, 8.11552, -19.2207, 8.1193, -25.1849, -9.39734, -25.4961, -8.69023, -18.1599, -2.59144, -17.718, -11.0767, -15.7734, -3.6521, -14.2708, -9.48573, -0.0402908, -0.293339, -7.73008 )
+
+[node name="Polygon2D" type="Polygon2D" parent="Polygon2D"]
+position = Vector2( 0, -0.530331 )
+color = Color( 0.427451, 0.584314, 0.913725, 1 )
+polygon = PoolVector2Array( -3.91726, -22.2258, -1.79594, -22.3142, -1.61916, -20.458, -3.91726, -20.6348 )
+
+[node name="Polygon2D2" type="Polygon2D" parent="Polygon2D"]
+position = Vector2( 6.0988, -0.618717 )
+color = Color( 0.427451, 0.584314, 0.913725, 1 )
+polygon = PoolVector2Array( -3.91726, -22.2258, -1.79594, -22.3142, -1.61916, -20.458, -3.91726, -20.6348 )
