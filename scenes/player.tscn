@@ -19,6 +19,8 @@ lowfallMultiplier = 40
 maxfallspeed = 500
 Wall_jump_Velocity = Vector2( 230, -210 )
 wall_climb_speed = 75
+stamina_on_wall = 0.5
+stamina_wall_climb = 1
 stamina_wall_climb_jump = 50
 
 [node name="Icon" type="Sprite" parent="."]
