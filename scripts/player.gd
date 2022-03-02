@@ -47,7 +47,7 @@ var can_wall_climb = true
 var is_wall_climbing = false
 #stamina
 export var max_stamina = 200
-var stamina 
+var stamina = max_stamina
 export var stamina_on_wall : float = 1
 export var stamina_wall_climb = 2
 export var stamina_wall_climb_jump = 5
@@ -83,7 +83,7 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	print(velocity.x)
+	print(stamina)
 	
 	
 	
@@ -148,6 +148,12 @@ func movement():
 		can_wall_climb = true
 		
 	
+	#stamina sliding
+	if stamina <= 0 and wall_direction != 0:
+		velocity.y = max_wall_slide_speed+30
+		
+	
+	
 	#wall jumping and sliding
 	if !is_on_floor() and wall_direction != 0:
 		wall_jumping()
@@ -167,12 +173,9 @@ func movement():
 		elif Input.is_action_pressed("ui_down"):
 			velocity.y = wall_climb_speed
 			stamina -= stamina_wall_climb
-		elif Input.is_action_just_pressed("ui_jump"):
-			pass
 		else: 
 			velocity.y = 0
 			stamina -= stamina_on_wall
-		wall_jumping()
 		is_wall_climbing = true
 	else:
 		can_move = true
@@ -191,9 +194,7 @@ func acceleration():
 		velocity.x -= acceleration #/ 2
 	else:
 		velocity.x = max_speed * sign(velocity.x)
-	#if velocity.x == max_speed-deceleration and direction == -1:
-	#	deceleration = turning_speed
-	#else: deceleration = export_deceleration
+
 
 func deceleration():
 	if velocity.x > 0 and direction == 1:
@@ -201,7 +202,7 @@ func deceleration():
 	elif velocity.x < 0 and direction == -1:
 		velocity.x += deceleration
 	elif (wall_direction !=0 and !is_on_floor()) or has_wall_jumped:
-		velocity.x += deceleration * wall_direction *6
+		velocity.x += deceleration * wall_direction
 	else: velocity.x = 0
 
 
@@ -212,6 +213,11 @@ func jump(): #jumping
 	velocity.y = jump_velocity
 	
 
+func wall_jump(climbing): #wall jumping
+	velocity.y = jump_velocity+30
+	if !climbing:
+		velocity.x += 125 * -wall_direction
+
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
@@ -220,8 +226,8 @@ func wall_jumping():
 		has_wall_jumped = true
 		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
-			wall_jump_velocity.x = 0
-		velocity = Vector2(wall_jump_velocity.x * -wall_direction, wall_jump_velocity.y)
+			wall_jump(true)
+		else: wall_jump(false)
 
 func _update_wall_directions():
 	var is_near_wall_left = _check_is_valid_wall(left_wall_raycasts)
