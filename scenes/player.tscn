@@ -34,25 +34,31 @@ shape = SubResource( 1 )
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsRight"]
 position = Vector2( 8.075, -16 )
 enabled = true
-cast_to = Vector2( 1, 0 )
+cast_to = Vector2( 0.5, 0 )
 
 [node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsRight"]
 position = Vector2( 8.14779, -0.0353727 )
 enabled = true
-cast_to = Vector2( 1, 0 )
+cast_to = Vector2( 0.5, 0 )
 
 [node name="WallRaycastsLeft" type="Node2D" parent="."]
 
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsLeft"]
 position = Vector2( -8.145, -16 )
 enabled = true
-cast_to = Vector2( -1, 0 )
+cast_to = Vector2( -0.5, 0 )
 
 [node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsLeft"]
 position = Vector2( -8.07221, -0.0774574 )
 enabled = true
-cast_to = Vector2( -1, 0 )
+cast_to = Vector2( -0.5, 0 )
 
 [node name="Coyote timer" type="Timer" parent="."]
 wait_time = 0.1
 one_shot = true
+
+[node name="wall_jump_timer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="timeout" from="wall_jump_timer" to="." method="_on_wall_jump_timer_timeout"]

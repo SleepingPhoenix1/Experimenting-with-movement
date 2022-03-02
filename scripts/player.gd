@@ -83,7 +83,7 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	print(stamina)
+	print(can_move)
 	
 	
 	
@@ -178,7 +178,8 @@ func movement():
 			stamina -= stamina_on_wall
 		is_wall_climbing = true
 	else:
-		can_move = true
+		if !has_wall_jumped:
+			can_move = true
 		jump_gravity = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
 		fall_gravity = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 		is_wall_climbing = false
@@ -217,17 +218,20 @@ func wall_jump(climbing): #wall jumping
 	velocity.y = jump_velocity+30
 	if !climbing:
 		velocity.x += 125 * -wall_direction
-
+		
+	has_wall_jumped = true
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
 		stamina -= stamina_wall_climb_jump
 		can_wall_climb = false
-		has_wall_jumped = true
 		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
 			wall_jump(true)
-		else: wall_jump(false)
+		else: 
+			wall_jump(false)
+			can_move = false
+			$wall_jump_timer.start()
 
 func _update_wall_directions():
 	var is_near_wall_left = _check_is_valid_wall(left_wall_raycasts)
@@ -253,6 +257,6 @@ func _check_is_valid_wall(wall_raycasts):
 
 
 
-
-
-
+func _on_wall_jump_timer_timeout():
+	can_move = true
+	print("A")
