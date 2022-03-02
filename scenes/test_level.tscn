@@ -84,6 +84,7 @@ shape = SubResource( 1 )
 
 [node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
 position = Vector2( -24, 192 )
+slower_fall_mult = 2
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
 position = Vector2( 1.90735e-06, -40 )
