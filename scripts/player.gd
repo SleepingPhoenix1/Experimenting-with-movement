@@ -24,6 +24,7 @@ export var jump_height : float
 export var jump_time_to_peak : float
 export var jump_time_to_descent : float
 export var lowfallMultiplier = 1
+var jump_buffer = false
 
 onready var jump_velocity : float = ((2.0 * jump_height) / jump_time_to_peak) * -1.0
 onready var jump_gravity : float = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
@@ -83,11 +84,13 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	print(can_move)
+	#print(can_move)
 	
+	#jump buffering
+	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
+		jump_buffer = true
 	
-	
-	if Input.is_action_just_pressed("ui_jump"):
+	if Input.is_action_just_pressed("ui_jump") or (is_on_floor() and jump_buffer):
 		has_pressed_jump = true
 		if is_on_floor() or !$"Coyote timer".is_stopped():
 			jump()
@@ -126,33 +129,8 @@ func movement():
 	if !is_on_floor() and was_on_floor and !has_jumped and velocity.y > 0:
 		$"Coyote timer".start()
 	
-	#max falling speed
-	if velocity.y > maxfallspeed:
-		velocity.y = maxfallspeed
 	
-	#stops y velocity if you hit ceiling
-	if is_on_ceiling():
-		velocity.y = 0
-	
-	#removes y velocity when on ground
-	if is_on_floor() and !has_jumped:
-		velocity.y = 1
-		stamina = max_stamina
-	
-	#removes x velocity if colliding with a wall
-	if is_on_wall():
-		velocity.x = 0
-	
-	#fall detector
-	if velocity.y > 0:
-		can_wall_climb = true
-		
-	
-	#stamina sliding
-	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
-		velocity.y = max_wall_slide_speed+30
-		
-	
+	workarounds()
 	
 	#wall jumping and sliding
 	if !is_on_floor() and wall_direction != 0:
@@ -212,7 +190,7 @@ func get_gravity() -> float:  #sets gravity type
 
 func jump(): #jumping
 	velocity.y = jump_velocity
-	
+	jump_buffer = false
 
 func wall_jump(climbing): #wall jumping
 	velocity.y = jump_velocity+30
@@ -253,10 +231,33 @@ func _check_is_valid_wall(wall_raycasts):
 
 
 
-
-
-
-
 func _on_wall_jump_timer_timeout():
 	can_move = true
-	print("A")
+
+func workarounds():
+		#max falling speed
+	if velocity.y > maxfallspeed:
+		velocity.y = maxfallspeed
+	
+	#stops y velocity if you hit ceiling
+	if is_on_ceiling():
+		velocity.y = 0
+	
+	#removes y velocity when on ground
+	if is_on_floor() and !has_jumped:
+		velocity.y = 1
+		stamina = max_stamina
+	
+	#removes x velocity if colliding with a wall
+	if is_on_wall():
+		velocity.x = 0
+	
+	#fall detector
+	if velocity.y > 0:
+		can_wall_climb = true
+		
+	
+	#stamina sliding
+	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
+		velocity.y = max_wall_slide_speed+30
+		
