@@ -149,7 +149,7 @@ func movement():
 		
 	
 	#stamina sliding
-	if stamina <= 0 and wall_direction != 0:
+	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
 		velocity.y = max_wall_slide_speed+30
 		
 	
