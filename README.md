@@ -4,7 +4,9 @@ So... Currently added stuff:
 
 -smooth movement with acceleration and deceleration
 
--variable jumping with coyote jusping(no jump buffering yet, but will be added soon)
+-variable jumping with coyote jusping 
+
+-jump buffering 
 
 -wall sliding like in celeste(i would even say exactly)
 
