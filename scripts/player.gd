@@ -84,7 +84,7 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	#print(can_move)
+	#print(wall_direction)
 	
 	#jump buffering
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -113,9 +113,11 @@ func movement():
 	if Input.is_action_pressed("ui_left"):
 		is_moving = true
 		direction = -1
+		$CharacterSprite.flip_h = true
 	elif Input.is_action_pressed("ui_right"):
 		is_moving = true
 		direction = 1
+		$CharacterSprite.flip_h = false
 	else: 
 		
 		is_moving = false
@@ -142,6 +144,7 @@ func movement():
 	
 	#wall climbing
 	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb and stamina > 0:
+		#print("b")
 		can_move = false
 		jump_gravity = 0
 		fall_gravity = 0
@@ -156,12 +159,12 @@ func movement():
 			stamina -= stamina_on_wall
 		is_wall_climbing = true
 	else:
+		#print("a")
 		if !has_wall_jumped:
 			can_move = true
 		jump_gravity = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
 		fall_gravity = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 		is_wall_climbing = false
-	
 	
 	
 
