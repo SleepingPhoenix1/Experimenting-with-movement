@@ -66,16 +66,18 @@ func _process(delta):
 		tick = false
 		
 	
-	#lowers max speed if in air
+	###### GRAVITY ######
 	if !is_on_floor():
-		#gravity
-		
 		velocity.y += get_gravity() * delta 
+		
+		#### SLOWING DOWN IN AIR ####
 		if has_jumped and !tick:
 			max_speed -= jump_slowing_down
 			tick = true
 			has_pressed_jump = false
-		has_jumped = true
+		
+		if stamina == max_stamina:
+			has_jumped = true
 	
 	
 
@@ -84,12 +86,14 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	print(has_wall_jumped)
+	animations()
+	#print(velocity.y)
 	
-	#jump buffering
+	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
 		jump_buffer = true
 	
+	######## JUMPING ##########
 	if Input.is_action_just_pressed("ui_jump") or (is_on_floor() and jump_buffer):
 		has_pressed_jump = true
 		
@@ -98,35 +102,31 @@ func _physics_process(delta):
 			$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
 			$SoundPlayer.play()
 			$"Coyote timer".stop()
-		has_jumped = true
 	
-	#low jumping
+	###### LOWER JUMPING ######
 	if has_jumped and Input.is_action_just_released("ui_jump") and velocity.y < 0:
 		velocity.y += lowfallMultiplier
 
 
 func movement():
-	#acceleration 
+	##### ACCELERATION #####
 	if is_moving and can_move:
 		acceleration()
 	
 	
 	
-	#controls
+	##### MOVEMENT #####
 	if Input.is_action_pressed("ui_left"):
 		is_moving = true
 		direction = -1
-		$CharacterSprite.flip_h = true
 	elif Input.is_action_pressed("ui_right"):
 		is_moving = true
 		direction = 1
-		$CharacterSprite.flip_h = false
 	else: 
-		
 		is_moving = false
 		deceleration()
 	
-	#coyote timer
+	##### COYOTE TIMER #####
 	var was_on_floor = is_on_floor()
 	
 	move_and_slide(velocity, Vector2.UP)
@@ -137,7 +137,7 @@ func movement():
 	
 	workarounds()
 	
-	#wall jumping and sliding
+	##### WALL JUMPING AND SLIDING ####
 	if !is_on_floor() and wall_direction != 0:
 		wall_jumping()
 		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0:
@@ -145,10 +145,10 @@ func movement():
 		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0:
 			velocity.y = max_wall_slide_speed
 	
-	#wall climbing
+	##### WALL CLIMBING #####
 	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb and stamina > 0:
+		has_jumped = false
 		has_wall_jumped = false
-		#print("b")
 		can_move = false
 		jump_gravity = 0
 		fall_gravity = 0
@@ -163,7 +163,6 @@ func movement():
 			stamina -= stamina_on_wall
 		is_wall_climbing = true
 	else:
-		#print("a")
 		if !has_wall_jumped:
 			can_move = true
 		jump_gravity = ((-2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)) * -1.0
@@ -202,13 +201,14 @@ func wall_jump(climbing): #wall jumping
 	velocity.y = jump_velocity+10
 	if !climbing:
 		velocity.x += 125 * -wall_direction
+	else: stamina -= stamina_wall_climb_jump
 	$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
 	$SoundPlayer.play()
 	has_wall_jumped = true
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
-		stamina -= stamina_wall_climb_jump
+		
 		can_wall_climb = false
 		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
@@ -268,3 +268,23 @@ func workarounds():
 	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
 		velocity.y = max_wall_slide_speed+30
 		
+
+
+func animations():  #add animations here
+	#walking
+	if Input.is_action_pressed("ui_left") and is_on_floor():
+		$AnimationPlayer.play("walk")
+		$"CharacterSprite-Sheet".flip_h = true
+	elif Input.is_action_pressed("ui_right") and is_on_floor():
+		$AnimationPlayer.play("walk")
+		$"CharacterSprite-Sheet".flip_h = false
+	else: $AnimationPlayer.play("idle")
+	
+	#jumping
+	if has_jumped:
+		$AnimationPlayer.play("jump")
+	
+	#start falling
+	if velocity.y > 1 and stamina == max_stamina:
+		$AnimationPlayer.play("fall_start")
+
