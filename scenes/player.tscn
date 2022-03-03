@@ -5,7 +5,7 @@
 [ext_resource path="res://sprites/character_Sprite.png" type="Texture" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 4, 7 )
+extents = Vector2( 3.9, 7 )
 
 [sub_resource type="VisualShaderNodeColorUniform" id=11]
 uniform_name = "ColorUniform2"
@@ -134,13 +134,13 @@ offset = Vector2( 6, -34 )
 [node name="WallRaycastsRight" type="Node2D" parent="."]
 
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsRight"]
-position = Vector2( 4, -14 )
+position = Vector2( 3.9, -14 )
 enabled = true
 cast_to = Vector2( 2, 0 )
 collision_mask = 256
 
 [node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsRight"]
-position = Vector2( 4, -1 )
+position = Vector2( 3.9, -1 )
 enabled = true
 cast_to = Vector2( 2, 0 )
 collision_mask = 256
@@ -148,13 +148,13 @@ collision_mask = 256
 [node name="WallRaycastsLeft" type="Node2D" parent="."]
 
 [node name="RayCast2D" type="RayCast2D" parent="WallRaycastsLeft"]
-position = Vector2( -4, -14 )
+position = Vector2( -3.9, -14 )
 enabled = true
 cast_to = Vector2( -2, 0 )
 collision_mask = 256
 
 [node name="RayCast2D2" type="RayCast2D" parent="WallRaycastsLeft"]
-position = Vector2( -4, -1 )
+position = Vector2( -3.9, -1 )
 enabled = true
 cast_to = Vector2( -2, 0 )
 collision_mask = 256
