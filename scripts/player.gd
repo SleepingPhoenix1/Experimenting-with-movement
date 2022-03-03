@@ -199,7 +199,7 @@ func jump(): #jumping
 	jump_buffer = false
 
 func wall_jump(climbing): #wall jumping
-	velocity.y = jump_velocity+30
+	velocity.y = jump_velocity+10
 	if !climbing:
 		velocity.x += 125 * -wall_direction
 	$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
