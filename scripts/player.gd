@@ -92,8 +92,11 @@ func _physics_process(delta):
 	
 	if Input.is_action_just_pressed("ui_jump") or (is_on_floor() and jump_buffer):
 		has_pressed_jump = true
+		
 		if is_on_floor() or !$"Coyote timer".is_stopped():
 			jump()
+			$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
+			$SoundPlayer.play()
 			$"Coyote timer".stop()
 		has_jumped = true
 	
@@ -199,7 +202,8 @@ func wall_jump(climbing): #wall jumping
 	velocity.y = jump_velocity+30
 	if !climbing:
 		velocity.x += 125 * -wall_direction
-		
+	$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
+	$SoundPlayer.play()
 	has_wall_jumped = true
 
 func wall_jumping():
