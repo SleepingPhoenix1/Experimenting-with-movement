@@ -35,7 +35,7 @@ var has_pressed_jump = false
 var has_jumped = false
 export var slower_fall_mult = 20
 
-#wall stuff variables
+#WALL STUFF VARIABLES
 onready var left_wall_raycasts = $WallRaycastsLeft
 onready var right_wall_raycasts = $WallRaycastsRight
 var wall_direction = 0
@@ -46,6 +46,8 @@ export var wall_climb_speed = 50
 
 var can_wall_climb = true
 var is_wall_climbing = false
+var is_wall_sliding = false
+
 #stamina
 export var max_stamina = 200
 var stamina = max_stamina
@@ -87,7 +89,7 @@ func _physics_process(delta):
 	movement()
 	_update_wall_directions()
 	animations()
-	#print(velocity.y)
+	#print(wall_direction)
 	
 	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -142,8 +144,10 @@ func movement():
 		wall_jumping()
 		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0:
 			velocity.y = max_wall_slide_speed
+			is_wall_sliding = true
 		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0:
 			velocity.y = max_wall_slide_speed
+			is_wall_sliding = true
 	
 	##### WALL CLIMBING #####
 	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb and stamina > 0:
@@ -267,19 +271,26 @@ func workarounds():
 	#stamina sliding
 	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
 		velocity.y = max_wall_slide_speed+30
-		
+	
+	if wall_direction == 0 or is_on_floor() or is_wall_climbing:
+		is_wall_sliding = false
 
 
 func animations():  #add animations here
 	#walking
 	if Input.is_action_pressed("ui_left") and is_on_floor():
 		$AnimationPlayer.play("walk")
-		$"CharacterSprite-Sheet".flip_h = true
 	elif Input.is_action_pressed("ui_right") and is_on_floor():
 		$AnimationPlayer.play("walk")
-		$"CharacterSprite-Sheet".flip_h = false
 	else: $AnimationPlayer.play("idle")
 	
+	#sprite rotation
+	if Input.is_action_pressed("ui_left"):
+		if !is_wall_climbing:
+			$"CharacterSprite-Sheet".flip_h = true
+	elif Input.is_action_pressed("ui_right"):
+		if !is_wall_climbing:
+			$"CharacterSprite-Sheet".flip_h = false
 	#jumping
 	if has_jumped:
 		$AnimationPlayer.play("jump")
@@ -287,4 +298,7 @@ func animations():  #add animations here
 	#start falling
 	if velocity.y > 1 and stamina == max_stamina:
 		$AnimationPlayer.play("fall_start")
-
+	
+	#wall sliding
+	if is_wall_sliding:
+		pass
