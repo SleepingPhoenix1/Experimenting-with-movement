@@ -1,6 +1,7 @@
 extends KinematicBody2D
 signal landed
 
+var landing = false
 var tick = false
 var current_speed = 0
 var is_moving = false
@@ -66,7 +67,7 @@ func _process(delta):
 		has_jumped = false
 		has_wall_jumped = false
 		tick = false
-		$"Scale manager".play("land")
+		
 	
 	###### GRAVITY ######
 	if !is_on_floor():
@@ -89,7 +90,7 @@ func _physics_process(delta):
 	movement()
 	_update_wall_directions()
 	animations()
-	#print(can_move)
+	#print(wall_direction)
 	
 	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -296,23 +297,28 @@ func animations():  #add animations here
 		if !is_wall_climbing:
 			$"CharacterSprite-Sheet".flip_h = false
 	#jumping
-	if has_jumped or has_wall_jumped and velocity.y < 0:
+	if (has_jumped or has_wall_jumped) and velocity.y < 0:
 		$AnimationPlayer.play("jump")
 		#$"Scale manager".play("jump")
+		landing = true
 	
 	#start falling
-	if velocity.y > 1 and (stamina == max_stamina or has_wall_jumped or has_jumped) and !is_wall_climbing and !is_wall_sliding:
+	if velocity.y > 1 and !is_on_floor() and wall_direction == 0:
 		$AnimationPlayer.play("fall")
 		$"Scale manager".play("fall")
+		landing = true
 	
 	#wall sliding
-	if is_wall_sliding:
+	if is_wall_sliding and wall_direction != 0:
 		$AnimationPlayer.play("on_wall")
 		$"Scale manager".play("RESET")
 	
-	if is_wall_climbing:
+	if is_wall_climbing and wall_direction != 0:
 		$AnimationPlayer.play("on_wall")
 		$"Scale manager".play("RESET")
-		if -wall_direction == -1: $"CharacterSprite-Sheet".flip_h = false; else: $"CharacterSprite-Sheet".flip_h = true
+		if -direction == -1: $"CharacterSprite-Sheet".flip_h = false; else: $"CharacterSprite-Sheet".flip_h = true
 	
+	if is_on_floor() and landing:
+		$"Scale manager".play("land")
+		landing = false
 

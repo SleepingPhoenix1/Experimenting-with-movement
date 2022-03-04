@@ -667,6 +667,10 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 640, 180 )
 
 [node name="Particles" type="Node2D" parent="."]
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true
+}
 
 [node name="Viewport" type="Viewport" parent="Particles"]
 size = Vector2( 320, 180 )
