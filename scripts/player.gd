@@ -66,7 +66,7 @@ func _process(delta):
 		has_jumped = false
 		has_wall_jumped = false
 		tick = false
-		
+		$"Scale manager".play("land")
 	
 	###### GRAVITY ######
 	if !is_on_floor():
@@ -89,7 +89,7 @@ func _physics_process(delta):
 	movement()
 	_update_wall_directions()
 	animations()
-	#print(wall_direction)
+	#print(can_move)
 	
 	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -217,6 +217,8 @@ func wall_jumping():
 		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
 			wall_jump(true)
+			can_move = true
+			print("D")
 		else: 
 			wall_jump(false)
 			can_move = false
@@ -282,7 +284,9 @@ func animations():  #add animations here
 		$AnimationPlayer.play("walk")
 	elif Input.is_action_pressed("ui_right") and is_on_floor():
 		$AnimationPlayer.play("walk")
-	else: $AnimationPlayer.play("idle")
+	elif is_on_floor() and velocity.x == 0: 
+		$AnimationPlayer.play("idle")
+		
 	
 	#sprite rotation
 	if Input.is_action_pressed("ui_left"):
@@ -292,13 +296,23 @@ func animations():  #add animations here
 		if !is_wall_climbing:
 			$"CharacterSprite-Sheet".flip_h = false
 	#jumping
-	if has_jumped:
+	if has_jumped or has_wall_jumped and velocity.y < 0:
 		$AnimationPlayer.play("jump")
+		#$"Scale manager".play("jump")
 	
 	#start falling
-	if velocity.y > 1 and stamina == max_stamina:
-		$AnimationPlayer.play("fall_start")
+	if velocity.y > 1 and (stamina == max_stamina or has_wall_jumped or has_jumped) and !is_wall_climbing and !is_wall_sliding:
+		$AnimationPlayer.play("fall")
+		$"Scale manager".play("fall")
 	
 	#wall sliding
 	if is_wall_sliding:
-		pass
+		$AnimationPlayer.play("on_wall")
+		$"Scale manager".play("RESET")
+	
+	if is_wall_climbing:
+		$AnimationPlayer.play("on_wall")
+		$"Scale manager".play("RESET")
+		if -wall_direction == -1: $"CharacterSprite-Sheet".flip_h = false; else: $"CharacterSprite-Sheet".flip_h = true
+	
+

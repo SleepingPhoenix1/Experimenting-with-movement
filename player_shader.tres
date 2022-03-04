@@ -75,7 +75,6 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -177, 77.375 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 940, 220 )
@@ -86,10 +85,10 @@ nodes/fragment/7/position = Vector2( 60, 340 )
 nodes/fragment/8/node = SubResource( 8 )
 nodes/fragment/8/position = Vector2( 720, 400 )
 nodes/fragment/9/node = SubResource( 10 )
-nodes/fragment/9/position = Vector2( 228, 218.375 )
+nodes/fragment/9/position = Vector2( 520, 260 )
 nodes/fragment/10/node = SubResource( 11 )
-nodes/fragment/10/position = Vector2( 480, 200 )
-nodes/fragment/connections = PoolIntArray( 7, 0, 6, 0, 6, 1, 0, 1, 6, 0, 8, 0, 8, 0, 0, 0, 6, 0, 8, 4, 6, 0, 8, 5, 9, 0, 8, 1, 10, 0, 8, 3 )
+nodes/fragment/10/position = Vector2( 500, 600 )
+nodes/fragment/connections = PoolIntArray( 6, 1, 0, 1, 6, 0, 8, 0, 8, 0, 0, 0, 6, 0, 8, 4, 6, 0, 8, 5, 9, 0, 8, 1, 10, 0, 8, 3, 7, 0, 6, 0 )
 
 [resource]
 shader = SubResource( 9 )

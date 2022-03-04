@@ -1,4 +1,4 @@
-[gd_scene load_steps=87 format=2]
+[gd_scene load_steps=91 format=2]
 
 [ext_resource path="res://sprites/background.png" type="Texture" id=1]
 [ext_resource path="res://scenes/player.tscn" type="PackedScene" id=2]
@@ -12,6 +12,46 @@ background_mode = 4
 glow_enabled = true
 glow_hdr_threshold = 0.25
 glow_high_quality = true
+
+[sub_resource type="Gradient" id=34]
+offsets = PoolRealArray( 0, 0.136646, 0.875776, 1 )
+colors = PoolColorArray( 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=35]
+gradient = SubResource( 34 )
+
+[sub_resource type="ParticlesMaterial" id=33]
+emission_shape = 1
+emission_sphere_radius = 80.2
+flag_disable_z = true
+gravity = Vector3( 5, 1, 0 )
+initial_velocity = 10.0
+initial_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 1.5
+color_ramp = SubResource( 35 )
+
+[sub_resource type="ParticlesMaterial" id=85]
+emission_shape = 1
+emission_sphere_radius = 80.2
+flag_disable_z = true
+gravity = Vector3( -5, 1, 0 )
+initial_velocity = 10.0
+initial_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 1.5
+color_ramp = SubResource( 35 )
+
+[sub_resource type="ViewportTexture" id=86]
+viewport_path = NodePath("Particles/Viewport")
+
+[sub_resource type="ViewportTexture" id=87]
+viewport_path = NodePath("Particles/Viewport")
+
+[sub_resource type="ViewportTexture" id=88]
+viewport_path = NodePath("Particles/Viewport")
 
 [sub_resource type="OccluderPolygon2D" id=36]
 polygon = PoolVector2Array( 0, 0, 8, 0, 8, 8, 0, 8 )
@@ -236,7 +276,7 @@ points = PoolVector2Array( 0, 0, 4, 0, 4, 4, 0, 4 )
 polygon = PoolVector2Array( 4, 0, 8, 0, 8, 4, 4, 4 )
 
 [sub_resource type="ConvexPolygonShape2D" id=31]
-points = PoolVector2Array( 0, 0, 4, 0, 4, 4, 0, 4 )
+points = PoolVector2Array( 4, 0, 8, 0, 8, 4, 4, 4 )
 
 [sub_resource type="TileSet" id=3]
 0/name = "tileset.png 0"
@@ -574,25 +614,6 @@ points = PoolVector2Array( 0, 0, 4, 0, 4, 4, 0, 4 )
 } ]
 9/z_index = 0
 
-[sub_resource type="Gradient" id=34]
-offsets = PoolRealArray( 0, 0.136646, 0.875776, 1 )
-colors = PoolColorArray( 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
-
-[sub_resource type="GradientTexture" id=35]
-gradient = SubResource( 34 )
-
-[sub_resource type="ParticlesMaterial" id=33]
-emission_shape = 1
-emission_sphere_radius = 111.57
-flag_disable_z = true
-gravity = Vector3( -10, 1, 0 )
-initial_velocity = 10.0
-initial_velocity_random = 1.0
-orbit_velocity = 0.0
-orbit_velocity_random = 0.0
-scale = 1.5
-color_ramp = SubResource( 35 )
-
 [node name="test_level" type="Node2D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -645,14 +666,56 @@ texture = ExtResource( 6 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 640, 180 )
 
-[node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
-position = Vector2( -144, 136 )
-slower_fall_mult = 2
+[node name="Particles" type="Node2D" parent="."]
 
-[node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
-position = Vector2( 1.90735e-06, -32 )
-current = true
-zoom = Vector2( 0.7, 0.7 )
+[node name="Viewport" type="Viewport" parent="Particles"]
+size = Vector2( 320, 180 )
+own_world = true
+transparent_bg = true
+render_target_v_flip = true
+
+[node name="Particles2D" type="Particles2D" parent="Particles/Viewport"]
+modulate = Color( 41.04, 34.88, 0, 1 )
+self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
+position = Vector2( 150, 80 )
+z_index = -1
+amount = 3
+lifetime = 5.0
+explosiveness = 0.23
+randomness = 1.0
+process_material = SubResource( 33 )
+
+[node name="Particles2D2" type="Particles2D" parent="Particles/Viewport"]
+modulate = Color( 41.04, 34.88, 0, 1 )
+self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
+position = Vector2( 150, 80 )
+z_index = -1
+amount = 3
+lifetime = 5.0
+explosiveness = 0.23
+randomness = 1.0
+process_material = SubResource( 85 )
+
+[node name="TextureRect" type="TextureRect" parent="Particles"]
+margin_left = -168.0
+margin_top = 8.0
+margin_right = 152.0
+margin_bottom = 188.0
+texture = SubResource( 86 )
+
+[node name="TextureRect2" type="TextureRect" parent="Particles"]
+margin_left = 16.0
+margin_top = -40.0
+margin_right = 336.0
+margin_bottom = 140.0
+texture = SubResource( 87 )
+
+[node name="TextureRect3" type="TextureRect" parent="Particles"]
+margin_left = -160.0
+margin_top = -176.0
+margin_right = 160.0
+margin_bottom = 4.0
+texture = SubResource( 88 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource( 3 )
@@ -669,52 +732,11 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Particles2D" type="Particles2D" parent="."]
-modulate = Color( 41.04, 34.88, 0, 1 )
-self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
-position = Vector2( 104, 80 )
-z_index = -1
-amount = 5
-lifetime = 5.0
-explosiveness = 0.23
-process_material = SubResource( 33 )
+[node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( -144, 136 )
+slower_fall_mult = 2
 
-[node name="Particles2D2" type="Particles2D" parent="."]
-modulate = Color( 41.04, 34.88, 0, 1 )
-self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
-position = Vector2( -64, 112 )
-z_index = -1
-amount = 5
-lifetime = 5.0
-explosiveness = 0.23
-process_material = SubResource( 33 )
-
-[node name="Particles2D3" type="Particles2D" parent="."]
-modulate = Color( 41.04, 34.88, 0, 1 )
-self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
-position = Vector2( -160, -96 )
-z_index = -1
-amount = 5
-lifetime = 5.0
-explosiveness = 0.23
-process_material = SubResource( 33 )
-
-[node name="Particles2D4" type="Particles2D" parent="."]
-modulate = Color( 41.04, 34.88, 0, 1 )
-self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
-position = Vector2( 64, -104 )
-z_index = -1
-amount = 5
-lifetime = 5.0
-explosiveness = 0.23
-process_material = SubResource( 33 )
-
-[node name="Particles2D5" type="Particles2D" parent="."]
-modulate = Color( 41.04, 34.88, 0, 1 )
-self_modulate = Color( 0.117647, 0.117647, 0.117647, 1 )
-position = Vector2( 232, -48 )
-z_index = -1
-amount = 5
-lifetime = 5.0
-explosiveness = 0.23
-process_material = SubResource( 33 )
+[node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
+position = Vector2( 1.90735e-06, -32 )
+current = true
+zoom = Vector2( 0.7, 0.7 )
