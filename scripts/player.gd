@@ -316,7 +316,10 @@ func animations():  #add animations here
 	if is_wall_climbing and wall_direction != 0:
 		$AnimationPlayer.play("on_wall")
 		$"Scale manager".play("RESET")
-		if -direction == -1: $"CharacterSprite-Sheet".flip_h = false; else: $"CharacterSprite-Sheet".flip_h = true
+		if -wall_direction == -1: 
+			$"CharacterSprite-Sheet".flip_h = false
+		elif -wall_direction == 1: 
+			$"CharacterSprite-Sheet".flip_h = true
 	
 	if is_on_floor() and landing:
 		$"Scale manager".play("land")
