@@ -6,7 +6,8 @@ var tick = false
 var current_speed = 0
 var is_moving = false
 
-var direction
+var direction = 1
+var dash_direction = Vector2(1,0)
 var can_move = true
 
 export var acceleration = 10
@@ -16,6 +17,10 @@ var deceleration = 15
 export var export_max_speed = 120
 var max_speed = 100
 export var turning_speed = 50
+export var dash_speed = 500
+var is_dashing = false
+var can_dash_move = true
+var can_dash = true
 
 var velocity = Vector2()
 #jumping variables
@@ -71,7 +76,8 @@ func _process(delta):
 	
 	###### GRAVITY ######
 	if !is_on_floor():
-		velocity.y += get_gravity() * delta 
+		if $DashTimer.is_stopped():
+			velocity.y += get_gravity() * delta 
 		
 		#### SLOWING DOWN IN AIR ####
 		if has_jumped and !tick:
@@ -90,7 +96,8 @@ func _physics_process(delta):
 	movement()
 	_update_wall_directions()
 	animations()
-	#print(wall_direction)
+	dashing()
+	#print(velocity.x)
 	
 	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -119,10 +126,10 @@ func movement():
 	
 	
 	##### MOVEMENT #####
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("ui_left") and can_dash_move:
 		is_moving = true
 		direction = -1
-	elif Input.is_action_pressed("ui_right"):
+	elif Input.is_action_pressed("ui_right") and can_dash_move:
 		is_moving = true
 		direction = 1
 	else: 
@@ -143,10 +150,10 @@ func movement():
 	##### WALL JUMPING AND SLIDING ####
 	if !is_on_floor() and wall_direction != 0:
 		wall_jumping()
-		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0:
+		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0 and !is_dashing:
 			velocity.y = max_wall_slide_speed
 			is_wall_sliding = true
-		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0:
+		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0 and !is_dashing:
 			velocity.y = max_wall_slide_speed
 			is_wall_sliding = true
 	
@@ -182,7 +189,8 @@ func acceleration():
 	elif velocity.x > -max_speed and direction == -1:
 		velocity.x -= acceleration #/ 2
 	else:
-		velocity.x = max_speed * sign(velocity.x)
+		if $DashTimer.is_stopped():
+			velocity.x = max_speed * sign(velocity.x)
 
 
 func deceleration():
@@ -219,7 +227,7 @@ func wall_jumping():
 		if !is_moving and stamina > 0 and is_wall_climbing:
 			wall_jump(true)
 			can_move = true
-			print("D")
+
 		else: 
 			wall_jump(false)
 			can_move = false
@@ -261,6 +269,10 @@ func workarounds():
 	if is_on_floor() and !has_jumped:
 		velocity.y = 1
 		stamina = max_stamina
+		can_dash_move = true
+		$DashDisableMove.stop()
+		if velocity.x <= max_speed:
+			can_dash = true
 	
 	#removes x velocity if colliding with a wall
 	if is_on_wall():
@@ -277,6 +289,40 @@ func workarounds():
 	
 	if wall_direction == 0 or is_on_floor() or is_wall_climbing:
 		is_wall_sliding = false
+
+
+func dashing():
+	dash_direction.clamped(1)
+	if $DashTimer.is_stopped():
+		is_dashing = false
+		if is_moving:
+			dash_direction.x = -int(Input.is_action_pressed("ui_left")) + int(Input.is_action_pressed("ui_right"))
+		dash_direction.y = int(Input.is_action_pressed("ui_down")) - int(Input.is_action_pressed("ui_up"))
+		if dash_direction == Vector2(0,0) and dash_direction.y == 0:
+			dash_direction.x = 1 * direction
+		else: dash_direction.x = -int(Input.is_action_pressed("ui_left")) + int(Input.is_action_pressed("ui_right"))
+	else: is_dashing = true
+	if Input.is_action_just_pressed("dash") and can_dash and dash_direction != Vector2.ZERO:
+		can_dash = false
+		$DashTimer.start()
+		$DashDisableMove.start()
+		velocity = dash_direction.normalized() * dash_speed
+	
+	if velocity.y < -max_speed and is_dashing:
+		velocity.y += 50
+	
+	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,0):
+		velocity.x -= 25
+	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,0):
+		velocity.x += 25
+	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,-1):
+		velocity.x -= 10
+	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,-1):
+		velocity.x += 10
+	
+	if !$DashDisableMove.is_stopped():
+		can_dash_move = false
+	else: can_dash_move = true
 
 
 func animations():  #add animations here

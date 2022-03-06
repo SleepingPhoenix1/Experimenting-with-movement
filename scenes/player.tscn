@@ -219,7 +219,7 @@ tracks/1/keys = {
 "values": [ Vector2( 0, -6.5 ), Vector2( 0, -8 ) ]
 }
 
-[node name="KinematicBody2D" type="KinematicBody2D"]
+[node name="KinematicBody2D" type="KinematicBody2D" groups=["player"]]
 script = ExtResource( 2 )
 acceleration = 20
 export_max_speed = 110
@@ -308,5 +308,13 @@ anims/RESET = SubResource( 9 )
 anims/fall = SubResource( 10 )
 anims/jump = SubResource( 11 )
 anims/land = SubResource( 12 )
+
+[node name="DashTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="DashDisableMove" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
 
 [connection signal="timeout" from="wall_jump_timer" to="." method="_on_wall_jump_timer_timeout"]
