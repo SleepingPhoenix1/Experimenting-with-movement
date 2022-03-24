@@ -1,11 +1,13 @@
 extends KinematicBody2D
 signal landed
 
+var landing = false
 var tick = false
 var current_speed = 0
 var is_moving = false
 
-var direction
+var direction = 1
+var dash_direction = Vector2(1,0)
 var can_move = true
 
 export var acceleration = 10
@@ -15,6 +17,10 @@ var deceleration = 15
 export var export_max_speed = 120
 var max_speed = 100
 export var turning_speed = 50
+export var dash_speed = 500
+var is_dashing = false
+var can_dash_move = true
+var can_dash = true
 
 var velocity = Vector2()
 #jumping variables
@@ -35,7 +41,7 @@ var has_pressed_jump = false
 var has_jumped = false
 export var slower_fall_mult = 20
 
-#wall stuff variables
+#WALL STUFF VARIABLES
 onready var left_wall_raycasts = $WallRaycastsLeft
 onready var right_wall_raycasts = $WallRaycastsRight
 var wall_direction = 0
@@ -46,6 +52,8 @@ export var wall_climb_speed = 50
 
 var can_wall_climb = true
 var is_wall_climbing = false
+var is_wall_sliding = false
+
 #stamina
 export var max_stamina = 200
 var stamina = max_stamina
@@ -66,16 +74,19 @@ func _process(delta):
 		tick = false
 		
 	
-	#lowers max speed if in air
+	###### GRAVITY ######
 	if !is_on_floor():
-		#gravity
+		if $DashTimer.is_stopped():
+			velocity.y += get_gravity() * delta 
 		
-		velocity.y += get_gravity() * delta 
+		#### SLOWING DOWN IN AIR ####
 		if has_jumped and !tick:
 			max_speed -= jump_slowing_down
 			tick = true
 			has_pressed_jump = false
-		has_jumped = true
+		
+		if stamina == max_stamina:
+			has_jumped = true
 	
 	
 
@@ -84,44 +95,48 @@ func _process(delta):
 func _physics_process(delta):
 	movement()
 	_update_wall_directions()
-	#print(can_move)
+	animations()
+	dashing()
+	#print(velocity.x)
 	
-	#jump buffering
+	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
 		jump_buffer = true
 	
+	######## JUMPING ##########
 	if Input.is_action_just_pressed("ui_jump") or (is_on_floor() and jump_buffer):
 		has_pressed_jump = true
+		
 		if is_on_floor() or !$"Coyote timer".is_stopped():
 			jump()
+			$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
+			$SoundPlayer.play()
 			$"Coyote timer".stop()
-		has_jumped = true
 	
-	#low jumping
+	###### LOWER JUMPING ######
 	if has_jumped and Input.is_action_just_released("ui_jump") and velocity.y < 0:
 		velocity.y += lowfallMultiplier
 
 
 func movement():
-	#acceleration 
+	##### ACCELERATION #####
 	if is_moving and can_move:
 		acceleration()
 	
 	
 	
-	#controls
-	if Input.is_action_pressed("ui_left"):
+	##### MOVEMENT #####
+	if Input.is_action_pressed("ui_left") and can_dash_move:
 		is_moving = true
 		direction = -1
-	elif Input.is_action_pressed("ui_right"):
+	elif Input.is_action_pressed("ui_right") and can_dash_move:
 		is_moving = true
 		direction = 1
 	else: 
-		
 		is_moving = false
 		deceleration()
 	
-	#coyote timer
+	##### COYOTE TIMER #####
 	var was_on_floor = is_on_floor()
 	
 	move_and_slide(velocity, Vector2.UP)
@@ -132,16 +147,20 @@ func movement():
 	
 	workarounds()
 	
-	#wall jumping and sliding
+	##### WALL JUMPING AND SLIDING ####
 	if !is_on_floor() and wall_direction != 0:
 		wall_jumping()
-		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0:
+		if Input.is_action_pressed("ui_left") and wall_direction == -1 and velocity.y > 0 and !is_dashing:
 			velocity.y = max_wall_slide_speed
-		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0:
+			is_wall_sliding = true
+		elif Input.is_action_pressed("ui_right") and wall_direction == 1 and velocity.y > 0 and !is_dashing:
 			velocity.y = max_wall_slide_speed
+			is_wall_sliding = true
 	
-	#wall climbing
+	##### WALL CLIMBING #####
 	if Input.is_action_pressed("climb") and wall_direction != 0 and can_wall_climb and stamina > 0:
+		has_jumped = false
+		has_wall_jumped = false
 		can_move = false
 		jump_gravity = 0
 		fall_gravity = 0
@@ -162,8 +181,6 @@ func movement():
 		fall_gravity = ((-2.0 * jump_height) / (jump_time_to_descent * jump_time_to_descent)) * -1.0
 		is_wall_climbing = false
 	
-	
-	
 
 
 func acceleration():
@@ -172,7 +189,8 @@ func acceleration():
 	elif velocity.x > -max_speed and direction == -1:
 		velocity.x -= acceleration #/ 2
 	else:
-		velocity.x = max_speed * sign(velocity.x)
+		if $DashTimer.is_stopped():
+			velocity.x = max_speed * sign(velocity.x)
 
 
 func deceleration():
@@ -193,19 +211,23 @@ func jump(): #jumping
 	jump_buffer = false
 
 func wall_jump(climbing): #wall jumping
-	velocity.y = jump_velocity+30
+	velocity.y = jump_velocity+10
 	if !climbing:
 		velocity.x += 125 * -wall_direction
-		
+	else: stamina -= stamina_wall_climb_jump
+	$SoundPlayer.stream = preload("res://soundeffects/jump.ogg")
+	$SoundPlayer.play()
 	has_wall_jumped = true
 
 func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
-		stamina -= stamina_wall_climb_jump
+		
 		can_wall_climb = false
 		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
 			wall_jump(true)
+			can_move = true
+
 		else: 
 			wall_jump(false)
 			can_move = false
@@ -247,6 +269,10 @@ func workarounds():
 	if is_on_floor() and !has_jumped:
 		velocity.y = 1
 		stamina = max_stamina
+		can_dash_move = true
+		$DashDisableMove.stop()
+		if velocity.x <= max_speed:
+			can_dash = true
 	
 	#removes x velocity if colliding with a wall
 	if is_on_wall():
@@ -260,4 +286,88 @@ func workarounds():
 	#stamina sliding
 	if stamina <= 0 and wall_direction != 0 and !has_wall_jumped:
 		velocity.y = max_wall_slide_speed+30
+	
+	if wall_direction == 0 or is_on_floor() or is_wall_climbing:
+		is_wall_sliding = false
+
+
+func dashing():
+	dash_direction.clamped(1)
+	if $DashTimer.is_stopped():
+		is_dashing = false
+		if is_moving:
+			dash_direction.x = -int(Input.is_action_pressed("ui_left")) + int(Input.is_action_pressed("ui_right"))
+		dash_direction.y = int(Input.is_action_pressed("ui_down")) - int(Input.is_action_pressed("ui_up"))
+		if dash_direction == Vector2(0,0) and dash_direction.y == 0:
+			dash_direction.x = 1 * direction
+		else: dash_direction.x = -int(Input.is_action_pressed("ui_left")) + int(Input.is_action_pressed("ui_right"))
+	else: is_dashing = true
+	if Input.is_action_just_pressed("dash") and can_dash and dash_direction != Vector2.ZERO:
+		can_dash = false
+		$DashTimer.start()
+		$DashDisableMove.start()
+		velocity = dash_direction.normalized() * dash_speed
+	
+	if velocity.y < -max_speed and is_dashing:
+		velocity.y += 50
+	
+	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,0):
+		velocity.x -= 25
+	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,0):
+		velocity.x += 25
+	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,-1):
+		velocity.x -= 10
+	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,-1):
+		velocity.x += 10
+	
+	if !$DashDisableMove.is_stopped():
+		can_dash_move = false
+	else: can_dash_move = true
+
+
+func animations():  #add animations here
+	#walking
+	if Input.is_action_pressed("ui_left") and is_on_floor():
+		$AnimationPlayer.play("walk")
+	elif Input.is_action_pressed("ui_right") and is_on_floor():
+		$AnimationPlayer.play("walk")
+	elif is_on_floor() and velocity.x == 0: 
+		$AnimationPlayer.play("idle")
 		
+	
+	#sprite rotation
+	if Input.is_action_pressed("ui_left"):
+		if !is_wall_climbing:
+			$"CharacterSprite-Sheet".flip_h = true
+	elif Input.is_action_pressed("ui_right"):
+		if !is_wall_climbing:
+			$"CharacterSprite-Sheet".flip_h = false
+	#jumping
+	if (has_jumped or has_wall_jumped) and velocity.y < 0:
+		$AnimationPlayer.play("jump")
+		#$"Scale manager".play("jump")
+		landing = true
+	
+	#start falling
+	if velocity.y > 1 and !is_on_floor() and wall_direction == 0:
+		$AnimationPlayer.play("fall")
+		$"Scale manager".play("fall")
+		landing = true
+	
+	#wall sliding
+	if is_wall_sliding and wall_direction != 0:
+		$AnimationPlayer.play("on_wall")
+		$"Scale manager".play("RESET")
+	
+	if is_wall_climbing and wall_direction != 0:
+		$AnimationPlayer.play("on_wall")
+		$"Scale manager".play("RESET")
+		if -wall_direction == -1: 
+			$"CharacterSprite-Sheet".flip_h = false
+		elif -wall_direction == 1: 
+			$"CharacterSprite-Sheet".flip_h = true
+	
+	if is_on_floor() and landing:
+		$"Scale manager".play("land")
+		landing = false
+
