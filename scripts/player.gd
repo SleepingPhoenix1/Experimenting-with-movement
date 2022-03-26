@@ -1,5 +1,4 @@
 extends KinematicBody2D
-signal landed
 
 var landing = false
 var tick = false
@@ -7,6 +6,7 @@ var current_speed = 0
 var is_moving = false
 
 var direction = 1
+var main_dir = 1
 var dash_direction = Vector2(1,0)
 var can_move = true
 
@@ -92,7 +92,7 @@ func _process(delta):
 
 
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	movement()
 	_update_wall_directions()
 	animations()
@@ -123,23 +123,40 @@ func movement():
 	if is_moving and can_move:
 		acceleration()
 	
-	
-	
 	##### MOVEMENT #####
-	if Input.is_action_pressed("ui_left") and can_dash_move:
+	if Input.is_action_pressed("ui_left"):
 		is_moving = true
-		direction = -1
-	elif Input.is_action_pressed("ui_right") and can_dash_move:
+		if !Input.is_action_pressed("ui_right") and main_dir == -1:
+			direction = -1
+		elif Input.is_action_pressed("ui_right") and main_dir == -1:
+			direction = 1
+		if Input.is_action_pressed("ui_left") and Input.is_action_just_released("ui_right") and main_dir == 1:
+			main_dir = -1
+		if Input.is_action_just_pressed("ui_left") and !Input.is_action_pressed("ui_right"):
+			main_dir = -1
+		#print("l")
+	if Input.is_action_pressed("ui_right"):
+		#print("r")
 		is_moving = true
-		direction = 1
-	else: 
+		if !Input.is_action_pressed("ui_left") and main_dir == 1:
+			direction = 1
+		elif Input.is_action_pressed("ui_left") and main_dir == 1:
+			direction = -1
+		if Input.is_action_pressed("ui_right") and Input.is_action_just_released("ui_left") and main_dir == -1:
+			main_dir = 1
+		if Input.is_action_just_pressed("ui_right") and !Input.is_action_pressed("ui_left"):
+			main_dir = 1
+	
+	
+	
+	if !Input.is_action_pressed("ui_left") and !Input.is_action_pressed("ui_right"): 
 		is_moving = false
 		deceleration()
 	
 	##### COYOTE TIMER #####
 	var was_on_floor = is_on_floor()
 	
-	move_and_slide(velocity, Vector2.UP)
+	velocity = move_and_slide(velocity, Vector2.UP)
 	
 	if !is_on_floor() and was_on_floor and !has_jumped and velocity.y > 0:
 		$"Coyote timer".start()
@@ -183,6 +200,7 @@ func movement():
 	
 
 
+# warning-ignore:function_conflicts_variable
 func acceleration():
 	if velocity.x < max_speed and direction == 1:
 		velocity.x += acceleration #/ 2
@@ -193,6 +211,7 @@ func acceleration():
 			velocity.x = max_speed * sign(velocity.x)
 
 
+# warning-ignore:function_conflicts_variable
 func deceleration():
 	if velocity.x > 0 and direction == 1:
 		velocity.x -= deceleration
@@ -223,7 +242,6 @@ func wall_jumping():
 	if Input.is_action_just_pressed("ui_jump"):
 		
 		can_wall_climb = false
-		var wall_jump_velocity = Wall_jump_Velocity
 		if !is_moving and stamina > 0 and is_wall_climbing:
 			wall_jump(true)
 			can_move = true
@@ -316,9 +334,9 @@ func dashing():
 	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,0):
 		velocity.x += 25
 	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,-1):
-		velocity.x -= 10
+		velocity.x -= 20
 	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,-1):
-		velocity.x += 10
+		velocity.x += 20
 	
 	if !$DashDisableMove.is_stopped():
 		can_dash_move = false
@@ -336,10 +354,10 @@ func animations():  #add animations here
 		
 	
 	#sprite rotation
-	if Input.is_action_pressed("ui_left"):
+	if direction == -1:
 		if !is_wall_climbing:
 			$"CharacterSprite-Sheet".flip_h = true
-	elif Input.is_action_pressed("ui_right"):
+	elif direction == 1:
 		if !is_wall_climbing:
 			$"CharacterSprite-Sheet".flip_h = false
 	#jumping

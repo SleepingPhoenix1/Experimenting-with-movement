@@ -222,6 +222,7 @@ tracks/1/keys = {
 [node name="KinematicBody2D" type="KinematicBody2D" groups=["player"]]
 script = ExtResource( 2 )
 acceleration = 20
+export_deceleration = 15
 export_max_speed = 110
 jump_height = 30.0
 jump_time_to_peak = 0.3
