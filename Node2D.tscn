@@ -1,6 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://invert.tres" type="Material" id=1]
+[ext_resource path="res://button_test.png" type="Texture" id=2]
+[ext_resource path="res://player_B&W.png" type="Texture" id=3]
+[ext_resource path="res://sprites/square.png" type="Texture" id=4]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item; 
@@ -90,38 +93,70 @@ zoom = Vector2( 0.5, 0.5 )
 material = SubResource( 2 )
 
 [node name="BackBufferCopy2" type="BackBufferCopy" parent="for_shader"]
-position = Vector2( -1.0625, 0.5625 )
-copy_mode = 2
-rect = Rect2( -32, -32, 64, 64 )
-
-[node name="Polygon2D" type="Polygon2D" parent="for_shader/BackBufferCopy2"]
-material = ExtResource( 1 )
-position = Vector2( -10, 7 )
-polygon = PoolVector2Array( -3, -2, 2, -2, 3.28738, 18.0188, -3.38594, 16.03 )
-
-[node name="BackBufferCopy" type="BackBufferCopy" parent="for_shader"]
-position = Vector2( -2, 12 )
-rect = Rect2( -8, -8, 16, 16 )
-
-[node name="Polygon2D2" type="Polygon2D" parent="for_shader/BackBufferCopy"]
-material = ExtResource( 1 )
-position = Vector2( 2.73221, 1.01963 )
-polygon = PoolVector2Array( -2, -3, -2.21019, -2.44226, -2.38737, -0.847674, -2.74172, -1.02485, -2.52517, -2.58007, -2, -4, -1.44243, -4.07622, -1.63929, -5.00148, -1.30462, -5.6905, -0.162823, -5.86767, 0.112785, -5.00148, 0, -4, 0.388394, -3.97779, 0.742747, -2.46195, 0.860866, -1.02485, 0.526198, -1.00517, 0.329335, -2.22571, 0, -3, -0.182508, -1.47764, -0.0212708, 1.79287, 0.205292, 1.97256, 0, 2, -0.280938, 2.00683, -0.359684, 0.943775, -0.792782, -0.119283, -1.16682, -0.0799103, -1.69835, 0.825658, -1.6619, 1.83975, -1.4744, 2.00381, -1.73772, 2.02652, -2, 2, -1.79678, -1.43826 )
-
-[node name="BackBufferCopy3" type="BackBufferCopy" parent="for_shader"]
-position = Vector2( -20, 21 )
+position = Vector2( 0.264824, -2.38315 )
 copy_mode = 2
 rect = Rect2( -32, -32, 64, 64 )
 __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Polygon2D3" type="Polygon2D" parent="for_shader/BackBufferCopy3"]
+[node name="Polygon2D" type="Polygon2D" parent="for_shader/BackBufferCopy2"]
+visible = false
 material = ExtResource( 1 )
-position = Vector2( -3, -4 )
-polygon = PoolVector2Array( -3, -2, 69, -2, 69, 2, -3, 2 )
+position = Vector2( -10.3858, 7.24554 )
+polygon = PoolVector2Array( -3, -2, 2, -2, 1.20708, 8.97341, 0.575693, 7.50018, -0.0206146, 9.63987, 1.172, 8.86818, 3.28738, 18.0188, -3.38594, 16.03 )
+
+[node name="ButtonTest" type="Sprite" parent="for_shader/BackBufferCopy2"]
+material = ExtResource( 1 )
+position = Vector2( -10.2648, 5.38315 )
+texture = ExtResource( 2 )
+
+[node name="BackBufferCopy" type="BackBufferCopy" parent="for_shader"]
+position = Vector2( 8, -15 )
+copy_mode = 2
+rect = Rect2( 0, 0, 16, 16 )
+
+[node name="ButtonTest" type="Sprite" parent="for_shader/BackBufferCopy"]
+material = ExtResource( 1 )
+position = Vector2( -2, 8 )
+texture = ExtResource( 2 )
+centered = false
+
+[node name="Polygon2D2" type="Polygon2D" parent="for_shader/BackBufferCopy"]
+modulate = Color( 0, 0, 0, 1 )
+material = ExtResource( 1 )
+position = Vector2( -1, 30 )
+texture = ExtResource( 4 )
+polygon = PoolVector2Array( -2, -3, -2.21019, -2.44226, -2.38737, -0.847674, -2.74172, -1.02485, -2.52517, -2.58007, -2, -4, -1.44243, -4.07622, -1.63929, -5.00148, -1.30462, -5.6905, -0.162823, -5.86767, 0.112785, -5.00148, 0, -4, 0.388394, -3.97779, 0.742747, -2.46195, 0.860866, -1.02485, 0.526198, -1.00517, 0.329335, -2.22571, 0, -3, -0.182508, -1.47764, -0.0212708, 1.79287, 0.205292, 1.97256, 0, 2, -0.280938, 2.00683, -0.359684, 0.943775, -0.792782, -0.119283, -1.16682, -0.0799103, -1.69835, 0.825658, -1.6619, 1.83975, -1.4744, 2.00381, -1.73772, 2.02652, -2, 2, -1.79678, -1.43826 )
+
+[node name="BackBufferCopy4" type="BackBufferCopy" parent="for_shader"]
+position = Vector2( 3, -7 )
+copy_mode = 2
+rect = Rect2( 0, 0, 16, 16 )
+
+[node name="CharacterSprite" type="Sprite" parent="for_shader/BackBufferCopy4"]
+material = ExtResource( 1 )
+position = Vector2( 10, 6 )
+texture = ExtResource( 3 )
+
+[node name="BackBufferCopy3" type="BackBufferCopy" parent="for_shader"]
+position = Vector2( -20, 21 )
+copy_mode = 2
+rect = Rect2( -32, -32, 64, 64 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true
+}
+
+[node name="Polygon2D3" type="Polygon2D" parent="for_shader/BackBufferCopy3"]
+modulate = Color( 0, 0, 0, 1 )
+material = ExtResource( 1 )
+position = Vector2( -3, -2 )
+texture = ExtResource( 4 )
+polygon = PoolVector2Array( -3, -2, 51, -2, 51, -19, 69, -19, 69, 2, -3, 2 )
 
 [node name="Icon" type="Polygon2D" parent="for_shader"]
+modulate = Color( 0.282353, 0.54902, 0.243137, 1 )
 position = Vector2( 4, 0.999999 )
 scale = Vector2( 0.53125, 0.4375 )
 z_index = -1

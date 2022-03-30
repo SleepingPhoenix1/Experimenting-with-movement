@@ -3,11 +3,10 @@
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
 
-
-
-void fragment() {
-	vec3 c = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgb;
-	COLOR.rgba = vec4(vec3(1.0) - c, 1.0);
+void fragment(){
+	vec3 c = textureLod(SCREEN_TEXTURE,SCREEN_UV,0.0).rgb;
+	vec4 tex = texture(TEXTURE,UV);
+	COLOR.rgba = tex + vec4(vec3(1.0)-c, tex.a);
 }"
 
 [resource]
