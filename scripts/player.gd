@@ -97,7 +97,6 @@ func _physics_process(_delta):
 	_update_wall_directions()
 	animations()
 	dashing()
-	#print(velocity.x)
 	
 	###### JUMP BUFFERING ######
 	if $jumpBuffer.is_colliding() and Input.is_action_just_pressed("ui_jump") and velocity.y > 0:
@@ -276,7 +275,7 @@ func _on_wall_jump_timer_timeout():
 
 func workarounds():
 		#max falling speed
-	if velocity.y > maxfallspeed:
+	if velocity.y > maxfallspeed and !is_dashing:
 		velocity.y = maxfallspeed
 	
 	#stops y velocity if you hit ceiling
@@ -321,6 +320,7 @@ func dashing():
 		else: dash_direction.x = -int(Input.is_action_pressed("ui_left")) + int(Input.is_action_pressed("ui_right"))
 	else: is_dashing = true
 	if Input.is_action_just_pressed("dash") and can_dash and dash_direction != Vector2.ZERO:
+		velocity = Vector2.ZERO
 		can_dash = false
 		$DashTimer.start()
 		$DashDisableMove.start()
@@ -331,8 +331,10 @@ func dashing():
 	
 	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,0):
 		velocity.x -= 25
+		print("right")
 	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,0):
 		velocity.x += 25
+		print("left")
 	if velocity.x > max_speed and is_dashing and dash_direction == Vector2(1,-1):
 		velocity.x -= 20
 	elif velocity.x < -max_speed and is_dashing and dash_direction == Vector2(-1,-1):
